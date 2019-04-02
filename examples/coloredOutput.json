@@ -1,0 +1,7 @@
+[
+	{ "pattern": "^\\[radio\\]", "flags": "i", "prefix": "\\033[38;5;99m" },
+	{ "pattern": "^\\[power_man\\]", "flags": "i", "prefix": "\\033[38;5;214m" },
+	{ "pattern": "\\\"[^\\\"]*\\\"", "flags": "i", "prefix": "\\033[38;5;34m" },
+	{ "pattern": "[+-]?((\\d+\\.?\\d*)|(\\.\\d+))", "flags": "i", "prefix": "\\033[38;5;38m" },
+	{ "pattern": "[^\\s]+Data", "flags": "", "prefix": "\\033[1m", "suffix": "\\033[21m" }
+]
