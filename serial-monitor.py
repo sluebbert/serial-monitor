@@ -66,16 +66,16 @@ def connect(name, baudrate, regexes, showTimestamps):
 
 		stdout.write(' Done\n\n')
 
+		lastChar = '\n'
 		while not unlock:
-			line = ser.readline().decode("utf-8")
-			newline = True
+			line = ser.readline().decode("utf-8", "backslashreplace")
 			if len(line) > 0:
-				if newline and showTimestamps:
+				if lastChar == '\n' and showTimestamps:
 					stdout.write('\033[38;5;237m%s: \033[0m' % str(datetime.now()))
-				newline = '\n' in line
 
 				line = handleFormatting(line, regexes)
 				stdout.write(line + clearFormat)
+				lastChar = line[-1]
 
 def getRegexes(path):
 	regexes = []

@@ -3,7 +3,7 @@ A python script to listen to serial output from devices that auto unlocks and re
 
 With this running, you can truly just leave the serial monitor active on one screen and forget about it while flashing your image on another screen.
 
-This script has been tested against serial communication with Arduinos on a linux host. It makes use of the fuser command to check if the device is ready to accept a new connection, so is not currently directly compatible with windows.
+This script has been tested against serial communication with Arduinos and ESP boards on a linux host. It makes use of the fuser command to check if the device is ready to accept a new connection, so is not currently directly compatible with windows.
 
 # Features
  - Disconnects from the device when sent the signal USR1. Once this signal is caught, the script will wait for a specific amount of time and then try to reconnect once the device is available again.
