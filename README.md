@@ -10,6 +10,8 @@ This script has been tested against serial communication with Arduinos and ESP b
  - Allows the user to format or highlight output based on a provided list of regular expressions.
  - Toggles the DTR pin to reset the device when connected.
 
+![Example Output](examples/coloredOutput.png)
+
 # Use
 #### To connect:
 `$ ./serial-monitor.py name [options]`
