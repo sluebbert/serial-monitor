@@ -31,7 +31,8 @@ This will cause any serial-monitor script listening to temporarily disconnect. I
 |name|The device name. Ex: /dev/ttyUSB0||
 |-b, --baudrate|The baudrate to use.|9600|
 |-r, --regexes|The optional json file to load up that contains a list of regexes to use for formatting output.||
-|-s, --sleep|The amount of seconds to unlock and sleep for before retrying to connect when requested to disconnect.|5|
+|-s, --signal|The signal to listen to that will trigger a temporary disconnect.|SIGUSR1|
+|-w, --wait|The amount of seconds to unlock and sleep / wait for before retrying to connect when requested to disconnect.|5|
 |-t, --timestamps|Display timestamps before each new line received.|False|
 
 ### Output Formatting
