@@ -10,7 +10,11 @@ This script has been tested against serial communication with Arduinos and ESP b
  - Allows the user to format or highlight output based on a provided list of regular expressions.
  - Toggles the DTR pin to reset the device when connected.
 
+### With timestamps:
 ![Example Output](examples/coloredOutput.png)
+
+### With deltas:
+![Example Output](examples/coloredOutput2.png)
 
 # Use
 #### To connect:
@@ -28,21 +32,24 @@ This will cause any serial-monitor script listening to temporarily disconnect. I
 ### Options
 |Parameter|Description|Default|
 |---|---|---|
-|name|The device name. Ex: /dev/ttyUSB0||
-|-b, --baudrate|The baudrate to use.|9600|
+|name|The device name. Ex: `/dev/ttyUSB0`||
+|-b, --baudrate|The baudrate to use.|`9600`|
 |-r, --regexes|The optional json file to load up that contains a list of regexes to use for formatting output.||
-|-s, --signal|The signal to listen to that will trigger a temporary disconnect.|SIGUSR1|
-|-w, --wait|The amount of seconds to unlock and sleep / wait for before retrying to connect when requested to disconnect.|5|
-|-t, --timestamps|Display timestamps before each new line received.|False|
+|-s, --signal|The signal to listen to that will trigger a temporary disconnect.|`SIGUSR1`|
+|-w, --wait|The amount of seconds to unlock and sleep / wait for before retrying to connect when requested to disconnect.|`5`|
+|-t, --timestamps|Display timestamps before each new line received.|`False`|
+|-d, --deltas|Display deltas or duration of time between each read line.|`False`|
 
 ### Output Formatting
 The json file provided is expected to be a list of objects that have the following properties. These are matched and applied in the same order as they are defined.
 
 |Property Name|Description|Example|
 |---|---|---|
-|pattern|The regex pattern to match with|err(or)?|
-|flags|The regex flags to use|si|
-|prefix|The text to insert at the beginning of a match.|\\033[1m|
-|suffix|The text to insert at the end of a match.|\\033[21m|
+|pattern|The regex pattern to match with|`err(or)?`|
+|flags|The regex flags to use|`si`|
+|prefix|The text to insert at the beginning of a match.|`\\033[1m`|
+|suffix|The text to insert at the end of a match.|`\\033[21m`|
 
 **Note:** The script attempts to allow multiple matches from multiple regexes per output line. So you can do stacking of formatting if you don't get too fancy.
+
+Order of declared regexes does matter. Those declared later can override formatting of those before them.
