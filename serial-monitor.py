@@ -133,16 +133,20 @@ def getControlCharsRe():
 
 	return re.compile('[' + chars + ']')
 
-def connect(name, baudrate, regexes, showTimestamps, showDeltas):
-	with serial.Serial(name, baudrate=baudrate, bytesize=serial.EIGHTBITS, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, timeout=1, xonxoff=0, rtscts=0) as ser:
+def reset(serialInstance):
+	serialInstance.setDTR(False)
+	sleep(1)
+	serialInstance.flushInput()
+	serialInstance.setDTR(True)
+
+
+def connect(name, baudrate, regexes, showTimestamps, showDeltas, wdreset):
+	with serial.Serial(name, baudrate=baudrate, bytesize=serial.EIGHTBITS, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, timeout=0.1, xonxoff=0, rtscts=0) as ser:
 
 		stdout.write('Connecting...')
 		stdout.flush()
 
-		ser.setDTR(False)
-		sleep(1)
-		ser.flushInput()
-		ser.setDTR(True)
+		reset(ser)
 
 		stdout.write(' Done\n\n')
 
@@ -150,15 +154,16 @@ def connect(name, baudrate, regexes, showTimestamps, showDeltas):
 
 		lastTimestamp = None
 		lastChar = '\n'
+		lastOutputTime = datetime.now()
 		while not unlock:
 			line = ser.readline().decode("utf-8", "backslashreplace")
 			line = hiddenRe.sub(replaceControlChars, line)
 
+			now = datetime.now()
 			if len(line) > 0:
 				if lastChar == '\n' and showTimestamps:
-					now = datetime.now()
 					if showDeltas and lastTimestamp is not None:
-						timeDiff = datetime.now() - lastTimestamp
+						timeDiff = now - lastTimestamp
 						stdout.write('\033[38;5;237m%s ▲%s: \033[0m' % (str(now), str(timeDiff)))
 					else:	
 						stdout.write('\033[38;5;237m%s: \033[0m' % str(now))
@@ -168,6 +173,14 @@ def connect(name, baudrate, regexes, showTimestamps, showDeltas):
 				stdout.write(line + clearFormat)
 				lastChar = line[-1]
 				stdout.flush()
+				lastOutputTime = datetime.now()
+
+			wdTimeDiff = now - lastOutputTime
+			if wdreset is not None and wdTimeDiff.total_seconds() >= wdreset:
+				print('\nResetting due to timeout waiting on output (%s)\n' % (str(wdTimeDiff)))
+				lastOutputTime = datetime.now()
+				reset(ser)
+				lastTimestamp = None
 
 def getRegexes(path):
 	regexes = []
@@ -205,7 +218,7 @@ def getRegexes(path):
 
 	return regexes
 
-def main(name, baudrate, regexesPath, showTimestamps, showDeltas, unlockSleepAmount, signalValue):
+def main(name, baudrate, regexesPath, showTimestamps, showDeltas, unlockSleepAmount, wdreset, signalValue):
 	global unlock
 
 	regexes = []
@@ -225,7 +238,7 @@ def main(name, baudrate, regexesPath, showTimestamps, showDeltas, unlockSleepAmo
 		while True:
 			try:
 				if isDeviceAvailable(name):
-					connect(name, baudrate, regexes, showTimestamps, showDeltas)
+					connect(name, baudrate, regexes, showTimestamps, showDeltas, wdreset)
 					if unlock:
 						print('\nUnlocked due to request.')
 						sleep(unlockSleepAmount)
@@ -257,7 +270,8 @@ if __name__ == '__main__':
 	parser.add_argument('-s', '--signal', default='SIGUSR1', help='The signal to listen to that will trigger a temporary disconnect.')
 	parser.add_argument('-t', '--timestamps', action='store_true', help='Display timestamps before each new line received.')
 	parser.add_argument('-d', '--deltas', action='store_true', help='Display deltas in back to back timestamps.')
+	parser.add_argument('--wdreset', type=float, default=None, help='The amount of seconds to wait for output before auto resetting the device.')
 	args = parser.parse_args()
 
 	signalValue = signal.Signals[args.signal]
-	main(args.name, args.baudrate, args.regexes, args.timestamps, args.deltas, args.wait, signalValue)
+	main(args.name, args.baudrate, args.regexes, args.timestamps, args.deltas, args.wait, args.wdreset, signalValue)

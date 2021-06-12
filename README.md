@@ -39,6 +39,7 @@ This will cause any serial-monitor script listening to temporarily disconnect. I
 |-w, --wait|The amount of seconds to unlock and sleep / wait for before retrying to connect when requested to disconnect.|`5`|
 |-t, --timestamps|Display timestamps before each new line received.|`False`|
 |-d, --deltas|Display deltas or duration of time between each read line.|`False`|
+|--wdreset|The amount of seconds to wait for output before auto resetting the device. This allows you to have a backup to any watchdog timer you may already have configured on the device. After the provided amount of seconds of no serial output, the script will send a reset to the device.||
 
 ### Output Formatting
 The json file provided is expected to be a list of objects that have the following properties. These are matched and applied in the same order as they are defined.
